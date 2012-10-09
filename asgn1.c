@@ -8,7 +8,7 @@
 #define tag_code 3333
 
 
-void cal_force(float *data, int size, double* fx, double* fy, float mass);
+void cal_force(float *data, int size, float* fx, float* fy, float mass);
 
 int main(int argc,char *argv[])
 {
@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
 	static float dt = 1.0;
 	
 	float mass, vx, vy;
-	double fx, fy;
+	float fx, fy;
 	rounds = atoi(argv[1]);
 	
 	char* file_name;
@@ -100,10 +100,10 @@ int main(int argc,char *argv[])
 }
 
 
-void cal_force(float *data, int size, double* fx, double* fy, float mass) {
+void cal_force(float *data, int size, float* fx, float* fy, float mass) {
 	int i;
 	float xdiff,ydiff,r2;
-	double fx_t=0,fy_t=0,F;
+	float fx_t=0,fy_t=0,F;
 	float G=6.67384*pow(10,-11);  //gravitational constant
 
 	for(i=1;i < size;i++) {
