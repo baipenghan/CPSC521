@@ -111,12 +111,12 @@ void cal_force(float *data, int size, double* fx, double* fy, float mass) {
 			xdiff=data[i*3]-data[0];
 			ydiff=data[i*3 + 1]-data[1];
 
-			//calculate the force, if r0 is 0, then we have no force.
+			
 			r2=pow(xdiff,2)+pow(ydiff,2);
 			if(r2!=0) F=G*data[i*3+2]*mass/r2;
 			else F=0;
 
-			//output the components of the force, if the x or y difference is 0, we have no force, so ignore.
+			
 			if(xdiff!=0 || r2!=0) fx_t += F*xdiff/sqrt(r2);
 			if(ydiff!=0 || r2!=0) fy_t += F*ydiff/sqrt(r2);
 	
