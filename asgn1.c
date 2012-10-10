@@ -80,7 +80,7 @@ int main(int argc,char *argv[])
 		data[1] += vy*dt;
 	}
 	p = data;
-	for (i = 0; i < size; i++){
+	for (i = 0; i < size-1; i++){
 		MPI_Send(p, 3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD);
 		p += 3;
 		MPI_Recv(p, 3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD, &recv_status);
