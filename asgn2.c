@@ -8,7 +8,7 @@
 #define tag_code 3333
 
 
-void cal_force(float *data, int size, int gran, int k, double* fx, double* fy, float mass);
+void cal_force(float *data, int size, int gran, int k, float* fx, float* fy, float mass);
 
 int main(int argc,char *argv[])
 {
@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
 	static float dt = 1.0;
 	
 	float mass, vx, vy;
-	double fx, fy;
+	float fx, fy;
 	char* file_name;
 	rounds = atoi(argv[1]);
 	gran = atoi(argv[2]);
@@ -56,13 +56,18 @@ int main(int argc,char *argv[])
 		}
 		p = data;
 		
+		double timestamp1 = MPI_Wtime();
+		printf("Scatter start time: %lf\n", timestamp1);
 		
 		MPI_Send(p + 3 * gran, (bodies - gran) * 3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD);	
 	}
 	else if(rank == size -1){
 		MPI_Recv(data, gran * 3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD, &recv_status);
+		double timestamp1 = MPI_Wtime();
+		printf("Scatter end time: %lf\n", timestamp1);
 	}
 	else{
+
 		MPI_Recv(data,(size - rank) * gran * 3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD, &recv_status);
 		MPI_Send(p + 3 * gran, (size - rank - 1) * gran * 3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD);
 
@@ -75,10 +80,12 @@ int main(int argc,char *argv[])
 	}
 	for(j = 0; j < rounds; j++){
 		p = data;
-		for(i = 0; i < size; i++){
+		for(i = 0; i < size - 1; i++){
+
 			MPI_Send(p, gran * 3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD);
 			p += gran * 3;
 			MPI_Recv(p, gran * 3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD, &recv_status);
+			printf("%dttt%d\n", gran, rank);
 		}
 		for(k = 0; k < gran; k++){
 			mass = *(p + k*3 + 2);
@@ -97,10 +104,23 @@ int main(int argc,char *argv[])
 	
 	//Gathering Part
 	p = data;
-	for (i = 0; i < size; i++){
-		MPI_Send(p, gran*3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD);
-		p += gran*3;
-		MPI_Recv(p, gran*3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD, &recv_status);
+	if(rank == 0){
+		double timestamp2 = MPI_Wtime();
+		printf("Gathering start time: %lf\n", timestamp2);
+		for (i = 0; i < size-1; i++){
+			MPI_Send(p, gran*3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD);
+			p += gran*3;
+			MPI_Recv(p, gran*3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD, &recv_status);
+		}
+		double timestamp3 = MPI_Wtime();
+		printf("Gathering end time: %lf\n", timestamp3);
+	}
+	else {
+		for (i = 0; i < size-1; i++){
+			MPI_Send(p, gran*3, MPI_FLOAT, left, tag_code, MPI_COMM_WORLD);
+			p += gran*3;
+			MPI_Recv(p, gran*3, MPI_FLOAT, right, tag_code, MPI_COMM_WORLD, &recv_status);
+		}
 	}
 	
 	//printf("%f\t%f\t%f\n", data[0], data[1], data[2]);
@@ -117,10 +137,10 @@ int main(int argc,char *argv[])
 }
 
 
-void cal_force(float *data, int size, int gran, int k, double* fx, double* fy, float mass) {
+void cal_force(float *data, int size, int gran, int k, float* fx, float* fy, float mass) {
 	int i;
 	float xdiff,ydiff,r2;
-	double fx_t=0,fy_t=0,F;
+	float fx_t=0,fy_t=0,F;
 	float G=6.67384*pow(10,-11);  //gravitational constant
 
 	for(i = 0; i < size * gran; i++) {
