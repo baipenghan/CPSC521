@@ -1,0 +1,17 @@
+Add explanation for Assignment 2. 
+
+Weird pattern in 2 nodes.
+2 nodes 16 cores. 
+
+
+1.Therectical analysis on Assignment 3
+
+asgn 5:
+advantage of random 
+
+
+go deeply on the mulicore or machines 
+                openmp        mpi
+                
+
+add the quanzhong there
